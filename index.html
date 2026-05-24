@@ -2966,6 +2966,274 @@ function getQuestionById(id){
 }
 function totalQuestionCount(){ return getAllQuestions().length; }
 
+// ============ Fiches de cours (17 matières) ============
+// Contenu rédigé pour Sarah — synthèses pédagogiques originales.
+const LESSONS = {
+  // ----- PRO MCV -----
+  soncas: {
+    icon:'🎯', name:'SONCAS — les 6 motivations d\'achat', cat:'pro',
+    intro:'SONCAS est la grille la plus enseignée pour décoder ce qui pousse un client à acheter. Elle aide à <b>repérer la motivation dominante</b> en entretien, puis à <b>adapter l\'argumentaire</b>.',
+    sections:[
+      ['Les 6 motivations en détail',
+       '<ul><li><b>Sécurité</b> — besoin de garanties, de fiabilité, d\'éviter le risque. Mots-clés : <i>« solide »</i>, <i>« éprouvé »</i>, <i>« garanti »</i>, <i>« sans risque »</i>.</li><li><b>Orgueil</b> — besoin de reconnaissance, de statut, de se distinguer. Mots-clés : <i>« exclusif »</i>, <i>« unique »</i>, <i>« premium »</i>, <i>« édition limitée »</i>.</li><li><b>Nouveauté</b> — attrait pour l\'innovation, la dernière tendance. Mots-clés : <i>« dernier »</i>, <i>« inédit »</i>, <i>« révolutionnaire »</i>, <i>« sortie »</i>.</li><li><b>Confort</b> — recherche de simplicité, d\'ergonomie. Mots-clés : <i>« facile »</i>, <i>« rapide »</i>, <i>« sans effort »</i>, <i>« pratique »</i>.</li><li><b>Argent</b> — sensibilité au prix, à l\'économie, à la rentabilité. Mots-clés : <i>« promo »</i>, <i>« rentable »</i>, <i>« meilleur prix »</i>.</li><li><b>Sympathie</b> — importance accordée à la relation humaine. Mots-clés : <i>« vous »</i>, <i>« ensemble »</i>, <i>« on prend le temps »</i>.</li></ul>'],
+      ['Méthode de détection',
+       '<p>1. <b>Découvrir avant d\'argumenter</b> : questions ouvertes (QQOQCP — Qui, Quoi, Où, Quand, Comment, Pourquoi).</p><p>2. Écouter les <b>mots-clés</b> du client et observer son <b>comportement</b> (regard sur le prix, sur les détails, comparaison…).</p><p>3. Identifier la motivation <b>dominante</b> — parfois deux (ex. Sécurité + Argent pour un père de famille).</p>'],
+      ['Argumenter typé SONCAS',
+       '<p>À chaque motivation, un argument adapté :</p><ul><li>Sécurité → garanties, certifications, retours d\'expérience.</li><li>Orgueil → exclusivité, série limitée, visibilité sociale.</li><li>Nouveauté → date de sortie, brevet, innovation.</li><li>Confort → démonstration, prise en main rapide.</li><li>Argent → ROI chiffré, comparaison, économies.</li><li>Sympathie → suivi personnalisé, lien après-vente.</li></ul>']
+    ],
+    retenir:'Une bonne détection SONCAS = 80% de la vente faite. Variante <b>SONCASE</b> = on ajoute le E pour <b>Écologie</b>/<b>Environnement</b>, de plus en plus présent aux examens 2025+.'
+  },
+
+  cap: {
+    icon:'🧩', name:'CAP — Caractéristique / Avantage / Preuve', cat:'pro',
+    intro:'CAP est la <b>structure universelle d\'un argument de vente</b>. Elle transforme un fait technique en bénéfice client crédible.',
+    sections:[
+      ['La structure CAP',
+       '<ul><li><b>Caractéristique</b> — fait <i>objectif</i> et technique du produit (matière, dimension, fonction…). <i>« Batterie 4 500 mAh »</i>.</li><li><b>Avantage</b> — ce que <i>le client gagne</i> à utiliser cette caractéristique. <i>« Une journée entière d\'autonomie »</i>.</li><li><b>Preuve</b> — élément qui <b>crédibilise</b> l\'avantage : chiffre, témoignage, démo, certification. <i>« 24 h mesurées sur 200 cycles »</i>.</li></ul>'],
+      ['Variante SONCAS-CAP',
+       '<p>Pour rendre un CAP encore plus efficace, on l\'<b>oriente vers la motivation détectée</b>.</p><p>Exemple — client orienté <b>Sécurité</b> :</p><p>• Carac : « Coque renforcée IP68 »<br>• Avantage : « Vous ne craignez plus les chocs ni l\'eau »<br>• Preuve : « Testé 2 m sous l\'eau pendant 30 min »</p>'],
+      ['Pièges à éviter',
+       '<ul><li>Donner une caractéristique <b>sans avantage</b> (« c\'est en titane » → et alors ?).</li><li>Donner un avantage <b>sans preuve</b> = simple promesse.</li><li>Multiplier les CAP : <b>3 arguments forts</b> valent mieux que 10 tièdes.</li></ul>']
+    ],
+    retenir:'<b>Toujours chiffrer la preuve.</b> Un argument non chiffré reste de la promesse — et le client le sait. À l\'oral du Bac Pro, on attend 2 à 4 CAP bien construits par produit présenté.'
+  },
+
+  marges: {
+    icon:'🧮', name:'Calculs commerciaux', cat:'pro',
+    intro:'Le socle indispensable pour tout vendeur : maîtriser <b>TVA, marges, taux et coefficients</b>. Tombe systématiquement aux examens.',
+    sections:[
+      ['TVA — HT et TTC',
+       '<p>TTC = HT × (1 + taux)<br>HT = TTC / (1 + taux)</p><p>Taux français :</p><ul><li>20 % — standard (la plupart des produits)</li><li>10 % — restauration, transport, travaux dans le logement ancien</li><li>5,5 % — alimentaire de base, livres, équipements pour handicapés</li><li>2,1 % — médicaments remboursés, presse</li></ul>'],
+      ['Marge et taux',
+       '<p><b>Marge brute</b> = PV − PA<br><b>Taux de marge</b> = (PV − PA) / <b>PA</b> × 100 → calculé <i>sur le prix d\'achat</i><br><b>Taux de marque</b> = (PV − PA) / <b>PV</b> × 100 → calculé <i>sur le prix de vente</i></p><p><b>Coefficient multiplicateur</b> : PV = PA × k. C\'est le « combien de fois on multiplie le PA pour obtenir le PV ».</p>'],
+      ['Remises et variations',
+       '<p><b>Remise %</b> : prix final = prix × (1 − r/100)<br><b>Variation %</b> = (final − initial) / initial × 100<br><b>Évolution multiplicative</b> : ×(1 + t/100), ex. +20 % = ×1,20</p>'],
+      ['Stock et performance',
+       '<p><b>Panier moyen</b> = CA / nb clients<br><b>Coefficient de rotation</b> = CA / stock moyen → combien de fois le stock se renouvelle.<br><b>Durée de stockage</b> = 360 / rotation (en jours)</p>']
+    ],
+    retenir:'<b>Taux de marge ≠ taux de marque.</b> Le piège classique : on calcule la marge en valeur (€), puis le taux. Marge / PA = marge ; Marge / PV = marque. <b>Toujours préciser HT ou TTC</b> dans les énoncés.'
+  },
+
+  argumentation: {
+    icon:'💬', name:'Argumentation & traitement des objections', cat:'pro',
+    intro:'Une objection n\'est <b>pas un refus</b>, c\'est un <b>signal d\'intérêt</b>. La méthode est toujours la même : écouter, reformuler, traiter, verrouiller.',
+    sections:[
+      ['Les 4 phases du traitement',
+       '<ol><li><b>Accuser réception</b> — « Je comprends. » Ne JAMAIS commencer par « non » ou « mais ».</li><li><b>Creuser</b> — question ouverte pour identifier la VRAIE objection : « Qu\'est-ce qui vous freine concrètement ? »</li><li><b>Traiter</b> — preuve, exemple, comparaison, démo.</li><li><b>Verrouiller</b> — vérifier que l\'objection est levée : « C\'est plus clair ? »</li></ol>'],
+      ['Objections classiques',
+       '<ul><li><b>« C\'est trop cher »</b> → chiffrer le ROI, étaler dans le temps, comparer au coût d\'inaction.</li><li><b>« Je vais réfléchir »</b> → creuser la vraie objection cachée derrière.</li><li><b>« J\'en parle à mon conjoint »</b> → proposer un RDV à 3 ou une réservation 24 h sans engagement.</li><li><b>« J\'ai pas le temps »</b> → proposer un créneau précis (15 min) avec bénéfice clair.</li><li><b>« J\'ai trouvé moins cher ailleurs »</b> → comparer la valeur (garantie, SAV) plutôt que le prix nu.</li></ul>'],
+      ['Closing — savoir conclure',
+       '<p>Techniques classiques :</p><ul><li><b>Closing alternatif</b> : « Plutôt le bleu ou le noir ? »</li><li><b>Closing présomptif</b> : « Je vous fais l\'emballage cadeau ? »</li><li><b>Closing résumé</b> : reformulation des bénéfices + question fermée.</li><li><b>Closing urgent</b> : « Il en reste 2 en stock ». Honnête uniquement.</li></ul>']
+    ],
+    retenir:'Le silence après une objection est ton meilleur outil. <b>Pose la question, puis tais-toi.</b> Le premier qui parle perd la négociation.'
+  },
+
+  relation_client: {
+    icon:'🤝', name:'Relation client', cat:'pro',
+    intro:'La relation client va au-delà de la vente : c\'est l\'<b>ensemble du cycle</b> qui crée la satisfaction et la fidélité.',
+    sections:[
+      ['Le cycle complet',
+       '<p>Prise de contact → Découverte (besoins, motivations SONCAS) → Conseil → Argumentation (CAP) → Traitement des objections → Closing → Suivi → Fidélisation → Upsell / Cross-sell</p>'],
+      ['Indicateurs clés',
+       '<ul><li><b>NPS</b> (Net Promoter Score) — « Recommanderiez-vous ce magasin ? » sur 0-10. Score = % promoteurs (9-10) − % détracteurs (0-6).</li><li><b>CSAT</b> — satisfaction sur une transaction précise.</li><li><b>CES</b> (Customer Effort Score) — effort fourni pour obtenir le service.</li></ul>'],
+      ['Réclamations — méthode CERC',
+       '<p><b>C</b>ompréhension (écoute active, ne pas couper) → <b>E</b>mpathie (« je comprends votre déception ») → <b>R</b>ésolution (solution claire en 3 étapes) → <b>C</b>onclusion (vérifier la satisfaction).</p><p>Si tort = côté magasin : geste commercial mesuré (avoir, remboursement, échange).</p>'],
+      ['Persona et CRM',
+       '<p>Un <b>persona</b> = portrait-robot d\'un client type (âge, budget, motivations, freins).</p><p>Le <b>CRM</b> (Customer Relationship Management) centralise les infos : Salesforce, HubSpot, Pipedrive. Permet le suivi, la segmentation, les campagnes ciblées.</p>']
+    ],
+    retenir:'Un <b>client mécontent</b> en parle à <b>10 personnes</b>, un <b>client satisfait</b> à <b>3</b>. La réclamation bien traitée fidélise davantage qu\'une vente sans accroc.'
+  },
+
+  prospection: {
+    icon:'📞', name:'Prospection commerciale', cat:'pro',
+    intro:'Trouver de nouveaux clients : <b>ciblage</b>, <b>prise de contact</b>, <b>qualification</b>, <b>transformation</b>.',
+    sections:[
+      ['Étapes de la prospection',
+       '<ol><li><b>Ciblage</b> — définir la cible (secteur, taille, budget, persona).</li><li><b>Préparation</b> — fichier qualifié, scénario d\'appel.</li><li><b>Contact</b> — téléphone, email, social selling (LinkedIn), événements.</li><li><b>Qualification</b> — méthode <b>BANT</b> : Budget, Authority (décideur ?), Need, Timing.</li><li><b>RDV / Démo</b>.</li><li><b>Suivi</b> et relance.</li></ol>'],
+      ['Appel à froid — accroche',
+       '<p>Structure efficace en 15 secondes :</p><ul><li><b>Référence</b> : « Bonjour, c\'est X de [entreprise]. »</li><li><b>Ancrage</b> : « Je vous appelle parce que [info qui montre qu\'on a fait ses devoirs]. »</li><li><b>Permission</b> : « Est-ce le bon moment pour 2 minutes ? »</li></ul>'],
+      ['Email de prospection',
+       '<ul><li>Objet <b>court</b> et personnalisé (< 50 caractères).</li><li>Accroche : référence à un sujet concret de la cible.</li><li>Valeur claire : 1 bénéfice = 1 phrase.</li><li><b>Un seul CTA</b> (Call To Action) — pas 3.</li><li>Signature simple.</li></ul>'],
+      ['Indicateurs',
+       '<p>Taux de prise de RDV, taux de transformation RDV→vente, durée moyenne du cycle de vente, coût d\'acquisition client (CAC).</p>']
+    ],
+    retenir:'<b>Prospecter = écouter d\'abord, vendre ensuite.</b> Mieux vaut 5 prospects qualifiés que 50 contacts froids. Les meilleurs commerciaux préparent 30 minutes pour un appel d\'1 minute.'
+  },
+
+  fidelisation: {
+    icon:'💎', name:'Fidélisation & CRM', cat:'pro',
+    intro:'Fidéliser coûte <b>5× moins cher</b> qu\'acquérir. La fidélisation transforme un client unique en client récurrent — voire en ambassadeur.',
+    sections:[
+      ['Leviers de fidélisation',
+       '<ul><li><b>Qualité de service</b> (le minimum vital).</li><li><b>Personnalisation</b> — connaître le client, anticiper.</li><li><b>Programme fidélité</b> — points, cashback, statuts (Silver/Gold/Platinum).</li><li><b>Communauté</b> — événements VIP, accès anticipé.</li><li><b>Recommandation parrainage</b> — bonus pour le parrain ET le filleul.</li><li><b>Service après-vente</b> — réactivité, geste commercial mesuré.</li></ul>'],
+      ['Indicateurs',
+       '<ul><li><b>Taux de rétention</b> — % de clients qui reviennent sur une période.</li><li><b>Churn</b> (attrition) — % de clients perdus. Cible : < 5 %/an en B2C.</li><li><b>LTV</b> (Life Time Value) — CA cumulé moyen sur la durée de vie d\'un client.</li><li><b>CAC</b> (Coût Acquisition Client) — montant moyen pour gagner un client.</li><li>Ratio sain : <b>LTV / CAC ≥ 3</b>.</li></ul>'],
+      ['Outils CRM',
+       '<p>Le CRM centralise l\'historique : achats, échanges, préférences, segments. Il sert à la <b>segmentation</b> (créer des groupes), au <b>scoring</b> (qualifier les leads) et aux <b>campagnes</b> ciblées (emailing, SMS).</p><p>Exemples : Salesforce (entreprise), HubSpot (SMB), Pipedrive (PME), Zoho.</p>']
+    ],
+    retenir:'La pire chose qu\'un client puisse faire, ce n\'est pas se plaindre — c\'est <b>partir sans rien dire</b>. Un programme fidélité réussi a deux promesses : <b>récompense visible</b> + <b>traitement préférentiel</b>.'
+  },
+
+  animation_commerciale: {
+    icon:'🎉', name:'Animation commerciale', cat:'pro',
+    intro:'L\'animation est l\'ensemble des opérations <b>ponctuelles</b> qui boostent le trafic, les ventes ou la notoriété sur un point de vente.',
+    sections:[
+      ['Objectifs et types',
+       '<ul><li><b>Trafic</b> — faire venir du monde (jeu, démo, événement).</li><li><b>Vente</b> — promo, opération « produit star ».</li><li><b>Lancement</b> — nouveauté à mettre en avant.</li><li><b>Fidélisation</b> — opération réservée aux porteurs de carte.</li></ul>'],
+      ['Outils',
+       '<ul><li><b>Promotion</b> — remise %, X+1 gratuit, lot.</li><li><b>Tête de gondole (TG)</b> — emplacement très visible en bout d\'allée.</li><li><b>Démonstration</b> — produit montré en usage par un animateur.</li><li><b>Dégustation</b> — alimentaire.</li><li><b>Jeu-concours</b> — instant gagnant, tirage au sort.</li><li><b>Cross-merch</b> — produits complémentaires côte à côte (apéritif + olives).</li></ul>'],
+      ['Calendrier commercial',
+       '<ul><li>Sept-oct : <b>Rentrée</b>.</li><li>Nov : <b>Black Friday</b>, Single\'s Day.</li><li>Déc : <b>Fêtes</b>.</li><li>Jan : <b>Soldes d\'hiver</b>.</li><li>Mars-avr : <b>Pâques</b>, jardinerie.</li><li>Mai-juin : Fête des mères/pères, mariages.</li><li>Juin-juil : <b>Soldes d\'été</b>.</li><li>Juil-août : <b>Saison estivale</b>.</li></ul>'],
+      ['Méthode AIDA',
+       '<p><b>A</b>ttention — capter le regard (PLV, signalétique).<br><b>I</b>ntérêt — éveiller la curiosité (mise en scène, démo).<br><b>D</b>ésir — créer l\'envie (storytelling, témoignages).<br><b>A</b>ction — passer à l\'achat (CTA clair, urgence honnête).</p>']
+    ],
+    retenir:'Une animation se mesure : <b>objectif quantifié</b> (CA prévisionnel, trafic visé) en amont, <b>ROI</b> mesuré en aval. Sans mesure, c\'est de la décoration coûteuse.'
+  },
+
+  merchandising: {
+    icon:'🏷️', name:'Merchandising', cat:'pro',
+    intro:'Le merchandising organise <b>l\'espace de vente</b> pour que le client trouve, prenne, et achète. <b>70 % des décisions d\'achat se font en magasin.</b>',
+    sections:[
+      ['Les 5 B de Kepner',
+       '<ol><li><b>Bon produit</b> — assortiment adapté à la zone de chalandise.</li><li><b>Bon endroit</b> — bonne zone, bon niveau, bon facing.</li><li><b>Bon moment</b> — saisonnalité, pic d\'affluence.</li><li><b>Bonne quantité</b> — stock dispo, pas de rupture, pas de surstock.</li><li><b>Bonne information</b> — étiquette claire, PLV, ILV.</li></ol>'],
+      ['Implantation et zones',
+       '<ul><li><b>Zone chaude</b> — entrée, allée centrale, têtes de gondole.</li><li><b>Zone froide</b> — fonds, allées latérales, étages bas.</li><li><b>Niveau des yeux</b> (1,30 m–1,80 m) = <b>niveau qui vend le plus</b>. Le niveau des mains (~1 m) en second.</li><li><b>Niveau des pieds</b> (sol) = pour le volumineux ou les marques distributeur.</li></ul>'],
+      ['Vocabulaire technique',
+       '<ul><li><b>Facing</b> — nombre de produits identiques visibles en façade.</li><li><b>Linéaire au sol</b> = longueur du rayon (en m).</li><li><b>Linéaire développé</b> = linéaire au sol × nb de niveaux.</li><li><b>Tête de gondole (TG)</b> — bout d\'allée, prime à louer.</li><li><b>PLV</b> — Publicité sur le Lieu de Vente.</li><li><b>ILV</b> — Information sur le Lieu de Vente (signalétique).</li></ul>'],
+      ['Indicateurs',
+       '<p><b>Taux de présence</b> (= produit en rayon / produit référencé), <b>rotation</b> par référence, <b>indice de sensibilité</b> (% CA / % linéaire occupé).</p>']
+    ],
+    retenir:'<b>Le client achète d\'abord avec les yeux.</b> Un rayon mal implanté tue les ventes du meilleur produit. Le merchandising est de la <b>vente sans vendeur</b>.'
+  },
+
+  gestion_commerciale: {
+    icon:'📊', name:'Gestion commerciale', cat:'pro',
+    intro:'Piloter l\'activité commerciale par les <b>chiffres</b> : suivre, analyser, décider.',
+    sections:[
+      ['Indicateurs de performance',
+       '<ul><li><b>CA</b> = quantité × prix unitaire.</li><li><b>Marge</b>, <b>taux de marge</b>, <b>taux de marque</b>.</li><li><b>Quota</b> — objectif individuel de vente.</li><li><b>Taux de transformation</b> = ventes / contacts × 100.</li><li><b>Panier moyen</b> = CA / nb tickets.</li><li><b>Indice de fréquentation</b> et <b>indice d\'achat</b> (combien sur 10 entrent / achètent).</li></ul>'],
+      ['Tableaux de bord',
+       '<p>Un bon tableau de bord est <b>court</b> (10 lignes max) et <b>actionnable</b>. Contient :</p><ul><li>CA jour / semaine / mois vs N-1.</li><li>Taux de transformation et panier moyen.</li><li>Top 10 produits.</li><li>Stock alerte / rupture.</li><li>Écarts vs objectifs et plan d\'action.</li></ul>'],
+      ['Méthode SMART pour les objectifs',
+       '<p><b>S</b>pécifique, <b>M</b>esurable, <b>A</b>tteignable, <b>R</b>éaliste, <b>T</b>emporel.</p><p>Mauvais : « Augmenter les ventes. »<br>Bon : « +12 % de CA sur la catégorie X d\'ici fin juin via 2 actions précises. »</p>'],
+      ['Analyse des écarts',
+       '<p>Écart en valeur (€), en % et en volume. <b>Toujours expliquer l\'écart</b> (mix produit, prix, volume, saisonnalité) avant de proposer une action.</p>']
+    ],
+    retenir:'<b>Ce qui ne se mesure pas ne se pilote pas.</b> Un commercial qui ne connaît pas son taux de transformation et son panier moyen ne sait pas où agir.'
+  },
+
+  pse: {
+    icon:'🦺', name:'PSE — Prévention Santé Environnement', cat:'pro',
+    intro:'Connaître les <b>risques professionnels</b>, les <b>acteurs</b> de la prévention et la <b>réglementation</b> applicable.',
+    sections:[
+      ['Risques professionnels',
+       '<ul><li><b>TMS</b> (troubles musculo-squelettiques) — gestes répétitifs, port de charges. Première cause de maladie pro en France.</li><li><b>Risque chimique</b> — produits dangereux (FDS — Fiche de Données de Sécurité obligatoire).</li><li><b>Risque électrique</b> — habilitation BR/B1V selon les niveaux.</li><li><b>Risques psycho-sociaux (RPS)</b> — stress, harcèlement, burn-out.</li><li><b>Risques routiers</b> — première cause de mortalité au travail.</li></ul>'],
+      ['Acteurs de la prévention',
+       '<ul><li><b>Employeur</b> — obligation de sécurité de résultat.</li><li><b>Médecin du travail</b> — visites d\'embauche, périodiques, de reprise.</li><li><b>CSE / CSSCT</b> — Comité Social et Économique, Commission Santé Sécurité Conditions de Travail.</li><li><b>INRS</b> — Institut National de Recherche et de Sécurité (référence).</li><li><b>CARSAT</b> — gère la branche AT/MP de la Sécu.</li><li><b>Inspection du travail</b> — contrôle.</li></ul>'],
+      ['Documents obligatoires',
+       '<ul><li><b>DUERP</b> (Document Unique d\'Évaluation des Risques Professionnels) — obligatoire dès <b>1 salarié</b>, mise à jour <b>annuelle</b>.</li><li><b>Affichages obligatoires</b> — règlement intérieur, consignes incendie, numéros d\'urgence.</li><li><b>Registre des accidents bénins</b>.</li></ul>'],
+      ['Équipements de protection (EPI)',
+       '<ul><li><b>Casque, chaussures, gants, lunettes, masque</b> selon les risques.</li><li><b>Hiérarchie de la prévention</b> : éliminer → protéger collectivement → protéger individuellement (EPI = dernier recours).</li></ul>']
+    ],
+    retenir:'<b>Prévention &gt; correction.</b> Un accident évité ne se voit pas — mais coûte 0. Le DUERP est obligatoire dès 1 salarié et engage la responsabilité pénale du dirigeant.'
+  },
+
+  // ----- GÉNÉRALES -----
+  francais: {
+    icon:'📖', name:'Français', cat:'general',
+    intro:'Au Bac Pro : étude de textes, écriture longue, oral d\'expression. <b>Lire, analyser, argumenter, s\'exprimer clairement.</b>',
+    sections:[
+      ['Outils d\'analyse de texte',
+       '<ul><li><b>Champ lexical</b> — ensemble de mots liés à un thème.</li><li><b>Figures de style</b> — métaphore, comparaison, personnification, anaphore, antithèse, hyperbole.</li><li><b>Focalisation</b> — interne (narrateur dans la tête d\'un personnage), externe (caméra), zéro (omniscient).</li><li><b>Registre</b> — épique, tragique, comique, lyrique, polémique.</li><li><b>Énonciation</b> — qui parle, à qui, depuis quand, où ?</li></ul>'],
+      ['Méthode du commentaire',
+       '<p>1. <b>Lecture active</b> du texte (questions au crayon).<br>2. <b>Problématique</b> = question qui guide l\'analyse.<br>3. <b>Plan en 2-3 parties</b>, chaque partie = un axe d\'analyse.<br>4. Chaque § : idée + <b>citation du texte</b> + analyse.</p>'],
+      ['Méthode de l\'écriture longue',
+       '<p><b>Introduction</b> = accroche + présentation du sujet + annonce du plan.<br><b>Développement</b> = 2-3 §, 1 idée + 1 exemple concret par §.<br><b>Conclusion</b> = synthèse + ouverture.</p>'],
+      ['L\'oral',
+       '<p>Préparer une <b>fiche</b> mémo, pas un texte. <b>Articuler</b>, regarder le jury, gérer le temps. Prévoir une <b>question d\'ouverture</b> à la fin.</p>']
+    ],
+    retenir:'<b>Toujours citer le texte</b> pour justifier une affirmation. Sans citation, c\'est de l\'opinion. Au commentaire : 1 idée = 1 citation = 1 analyse.'
+  },
+
+  mathematiques: {
+    icon:'➗', name:'Mathématiques', cat:'general',
+    intro:'Au Bac Pro MCV, on attend des maths utiles : <b>pourcentages, statistiques, suites, fonctions, probabilités</b>.',
+    sections:[
+      ['Pourcentages et évolutions',
+       '<p>% d\'un nombre : N × t/100.<br>Évolution : ×(1 + t/100). +20 % puis −20 % ≠ retour au départ (c\'est ×1,2×0,8 = 0,96 = −4 %).<br>Évolutions successives : on <b>multiplie</b> les coefficients, on n\'<b>additionne pas</b> les %.</p>'],
+      ['Statistiques',
+       '<ul><li><b>Moyenne</b> = somme / nombre. <b>Moyenne pondérée</b> = Σ(xᵢ × nᵢ) / Σnᵢ.</li><li><b>Médiane</b> — valeur qui partage la série en 2.</li><li><b>Mode</b> — valeur la plus fréquente.</li><li><b>Étendue</b> = max − min.</li><li><b>Écart-type</b> — mesure de dispersion autour de la moyenne.</li></ul>'],
+      ['Suites',
+       '<p><b>Arithmétique</b> : on <b>ajoute</b> une raison r constante. uₙ = u₀ + n×r.<br><b>Géométrique</b> : on <b>multiplie</b> par une raison q constante. uₙ = u₀ × qⁿ. Utile pour les intérêts composés.</p>'],
+      ['Probabilités',
+       '<p>P(A) = nb cas favorables / nb cas possibles.<br>P(A ∪ B) = P(A) + P(B) − P(A ∩ B).<br>Événements indépendants : P(A ∩ B) = P(A) × P(B).<br>Probabilité conditionnelle : P(A|B) = P(A ∩ B) / P(B).</p>']
+    ],
+    retenir:'En Bac Pro on attend une démarche : <b>poser → calculer → conclure avec phrase</b>. Garder les unités (€, %, jours). Vérifier l\'ordre de grandeur avant de valider.'
+  },
+
+  histoire_geo: {
+    icon:'🌍', name:'Histoire-Géographie', cat:'general',
+    intro:'Comprendre <b>le monde contemporain</b> par les grandes ruptures historiques et les enjeux géographiques d\'aujourd\'hui.',
+    sections:[
+      ['Histoire — repères XXᵉ-XXIᵉ siècle',
+       '<ul><li><b>1914-18</b> : Première Guerre mondiale, traité de Versailles 1919.</li><li><b>1929</b> : crise économique mondiale.</li><li><b>1939-45</b> : Seconde Guerre mondiale, Shoah, bombe atomique.</li><li><b>1945</b> : ONU, début de la Guerre froide.</li><li><b>1957</b> : Traité de Rome (CEE).</li><li><b>1962-75</b> : décolonisations (Algérie, Vietnam).</li><li><b>1968</b> : Mai 68 — contestation sociale.</li><li><b>1989</b> : chute du Mur de Berlin.</li><li><b>1992</b> : Traité de Maastricht (UE).</li><li><b>2001</b> : 11 septembre.</li><li><b>2008</b> : crise des subprimes.</li><li><b>2020+</b> : Covid, guerre Ukraine, transitions énergétiques.</li></ul>'],
+      ['Géographie — la France dans la mondialisation',
+       '<ul><li><b>Métropoles</b> : Paris (rang mondial), Lyon, Marseille, Lille…</li><li><b>Espaces productifs</b> : agricole (Beauce), industriel (Toulouse aéronautique), de services (La Défense), touristique (Côte d\'Azur, Alpes).</li><li><b>Transports</b> : LGV, hubs aéroportuaires (CDG, Lyon), ports (Marseille-Fos, Le Havre).</li><li><b>Frontières et UE</b> : Schengen, marché unique, euro.</li></ul>'],
+      ['Méthode',
+       '<p>Paragraphe argumenté <b>PEEL</b> : <b>P</b>oint (idée), <b>E</b>xplication, <b>E</b>xemple précis (date, lieu, nom), <b>L</b>ien avec la problématique.</p>']
+    ],
+    retenir:'En histoire-géo, <b>ancrer chaque idée dans un fait précis</b> : date, lieu, chiffre, nom. Le jury veut du concret, pas du vague.'
+  },
+
+  emc: {
+    icon:'⚖️', name:'EMC — Enseignement Moral et Civique', cat:'general',
+    intro:'Comprendre la <b>République</b>, ses <b>institutions</b>, et la <b>citoyenneté</b> active.',
+    sections:[
+      ['Valeurs et principes de la République',
+       '<ul><li><b>Liberté, Égalité, Fraternité</b> — la devise.</li><li><b>Laïcité</b> — neutralité de l\'État, liberté de conscience (loi 1905).</li><li><b>République indivisible, laïque, démocratique et sociale</b> (article 1 de la Constitution).</li></ul>'],
+      ['Institutions',
+       '<ul><li><b>Président de la République</b> — élu au suffrage universel direct pour 5 ans (depuis 2000).</li><li><b>Premier ministre</b> — nommé par le Président.</li><li><b>Gouvernement</b> — nommé par le PM, conduit la politique de la Nation.</li><li><b>Assemblée nationale</b> — 577 députés, 5 ans, suffrage direct.</li><li><b>Sénat</b> — 348 sénateurs, 6 ans, suffrage indirect.</li><li><b>Conseil constitutionnel</b> — 9 membres, contrôle des lois.</li><li><b>Conseil d\'État</b> — justice administrative.</li><li><b>Cour de cassation</b> — sommet de la justice judiciaire.</li></ul>'],
+      ['Citoyenneté active',
+       '<ul><li><b>Droit de vote</b> à 18 ans, inscription sur les listes électorales.</li><li><b>Devoirs</b> — respecter la loi, payer ses impôts, défendre la patrie.</li><li><b>Engagement</b> — associations, syndicats, partis, service civique.</li></ul>'],
+      ['Médias et information',
+       '<p>Liberté d\'expression encadrée par la loi (diffamation, incitation à la haine). Importance du <b>vérification de l\'info</b>, distinction fait/opinion. Sources : multiplier, recouper, vérifier la date.</p>']
+    ],
+    retenir:'La <b>démocratie</b> n\'est pas un état acquis, c\'est un <b>exercice quotidien</b>. Voter, s\'informer, débattre, respecter les opinions adverses.'
+  },
+
+  anglais: {
+    icon:'🇬🇧', name:'Anglais', cat:'general',
+    intro:'4 compétences attendues : <b>comprendre</b> (écrit/oral), <b>s\'exprimer</b> (écrit/oral). Au Bac Pro MCV : vocabulaire commercial et situations professionnelles.',
+    sections:[
+      ['Vocabulaire commercial essentiel',
+       '<ul><li><b>customer</b> = client • <b>seller / sales assistant</b> = vendeur • <b>supplier</b> = fournisseur</li><li><b>price</b> / <b>discount</b> / <b>sale</b> / <b>promo</b></li><li><b>invoice</b> = facture • <b>receipt</b> = reçu • <b>refund</b> = remboursement</li><li><b>delivery</b> = livraison • <b>warranty</b> = garantie • <b>return</b> = retour</li><li><b>stock</b> = stock • <b>out of stock</b> = rupture • <b>on order</b> = en commande</li><li><b>checkout</b> = caisse • <b>aisle</b> = allée / rayon • <b>shelf</b> = étagère</li><li><b>loyalty card</b> = carte fidélité • <b>complaint</b> = réclamation</li></ul>'],
+      ['Temps essentiels',
+       '<ul><li><b>Present simple</b> — habitudes : « I work in a shop. »</li><li><b>Present continuous</b> — action en cours : « I am helping a customer. »</li><li><b>Past simple</b> — passé révolu : « I sold three items yesterday. »</li><li><b>Present perfect</b> — passé qui touche le présent : « I have just opened the store. »</li><li><b>Future</b> — <i>will</i> (décision spontanée) / <i>going to</i> (plan) : « We are going to launch a new product. »</li></ul>'],
+      ['Phrases types pour l\'oral',
+       '<ul><li><i>« Hello, can I help you? »</i></li><li><i>« What are you looking for? »</i></li><li><i>« Would you like me to wrap it up? »</i></li><li><i>« I\'d recommend the blue one because… »</i></li><li><i>« Let me check our stock. »</i></li><li><i>« The total is 49 pounds 90, please. »</i></li><li><i>« Cash or card? »</i></li><li><i>« Have a nice day! »</i></li></ul>']
+    ],
+    retenir:'À l\'oral du Bac Pro, on n\'attend pas un anglais parfait — on attend une <b>communication efficace</b>. <b>Préparer 5 questions et 5 réponses standard</b> couvre 80 % des cas.'
+  },
+
+  eco_droit: {
+    icon:'📈', name:'Économie-Droit', cat:'general',
+    intro:'Comprendre comment fonctionne l\'<b>économie</b> (acteurs, marchés, indicateurs) et le <b>droit</b> qui encadre l\'activité commerciale.',
+    sections:[
+      ['Économie — les agents',
+       '<ul><li><b>Ménages</b> — consomment, épargnent, fournissent du travail.</li><li><b>Entreprises</b> — produisent des biens et services, investissent, emploient.</li><li><b>État</b> — produit des services publics, redistribue, régule.</li><li><b>RDM</b> (Reste du Monde) — échanges internationaux.</li><li><b>Institutions financières</b> — banques, marchés.</li></ul><p>Le <b>circuit économique</b> relie ces agents par des flux (biens/services et monnaie).</p>'],
+      ['Indicateurs économiques',
+       '<ul><li><b>PIB</b> (Produit Intérieur Brut) — richesse créée annuellement.</li><li><b>Croissance</b> — variation du PIB en %.</li><li><b>Inflation</b> — hausse générale des prix (IPC).</li><li><b>Chômage</b> — sans-emploi cherchant un emploi.</li><li><b>Pouvoir d\'achat</b> — revenu / niveau des prix.</li></ul>'],
+      ['Droit — sources et juridictions',
+       '<ul><li><b>Sources</b> hiérarchisées : Constitution → traités → lois → règlements → jurisprudence → contrats.</li><li><b>Juridictions civiles</b> — tribunal judiciaire, tribunal de commerce.</li><li><b>Juridictions pénales</b> — tribunal de police, correctionnel, cour d\'assises.</li><li><b>Prudhommes</b> — conflits du travail.</li><li><b>Juridictions administratives</b> — tribunal administratif, Conseil d\'État.</li></ul>'],
+      ['Droit du travail',
+       '<ul><li><b>CDI</b> — contrat à durée indéterminée (la norme).</li><li><b>CDD</b> — durée déterminée, motif obligatoire, prime de précarité (10 %).</li><li><b>Période d\'essai</b> — variable selon convention.</li><li><b>Rupture</b> — démission, licenciement (cause réelle et sérieuse), rupture conventionnelle.</li></ul>'],
+      ['Droit du consommateur',
+       '<ul><li><b>Information précontractuelle</b> obligatoire.</li><li><b>Délai de rétractation</b> — 14 jours en VAD (vente à distance).</li><li><b>Garantie légale de conformité</b> — 2 ans.</li><li><b>Démarchage à domicile</b> — encadré, signature + 14 jours.</li></ul>']
+    ],
+    retenir:'<b>Tout contrat = consentement + capacité + objet + cause.</b> Sans l\'un des quatre, le contrat est nul. En droit, <b>l\'écrit prime</b> — toujours conserver les preuves.'
+  }
+};
+
 // ============ Calc generator (questions infinies) ============
 const TVA = [{l:'5,5 %',v:0.055},{l:'10 %',v:0.10},{l:'20 %',v:0.20}];
 const rand = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
@@ -3462,7 +3730,7 @@ function showToast(badge){
 }
 
 // ============ Routing minimal ============
-const ROUTES = ['home','revise','exam','oral','survival','errors','stats','progression','settings','custom'];
+const ROUTES = ['home','revise','exam','oral','survival','errors','stats','progression','settings','custom','course'];
 let CURRENT_ROUTE = 'home';
 let CURRENT_CTX = {}; // état temporaire de la vue (session quiz en cours, etc.)
 function navigate(route){
@@ -3582,11 +3850,13 @@ function pageHome(){
   const customN = (STATE.customQuestions||[]).length;
   const tiles = [
     ['revise','📚','Réviser','Quiz adaptatif'],
+    ['course','📖','Cours','17 fiches de révision'],
     ['exam','📝','Examen blanc','20 questions chrono'],
     ['oral','🎤','Mode oral','Scénarios SONCAS/CAP'],
     ['survival','🛡️','Survie','3 vies, va loin'],
     ['errors','⚠️','Mes erreurs',`${STATE.errors.length} à revoir`],
-    ['custom','✏️','Mes questions', customN>0 ? `${customN} perso` : 'Ajoute les tiennes']
+    ['custom','✏️','Mes questions', customN>0 ? `${customN} perso` : 'Ajoute les tiennes'],
+    ['settings','⚙️','Réglages','Profil, export, reset']
   ];
   const grid=h('div',{class:'tiles'});
   tiles.forEach(([r,emoji,ttl,sub])=>{
@@ -4062,7 +4332,83 @@ function pageProgression(){
   return wrap;
 }
 
-// ----- Settings -----
+// ----- Cours (fiches de révision) -----
+function pageCourse(){
+  CURRENT_CTX = Object.assign({lessonId:null}, CURRENT_CTX);
+  const wrap=h('div');
+
+  if(CURRENT_CTX.lessonId && LESSONS[CURRENT_CTX.lessonId]){
+    const L = LESSONS[CURRENT_CTX.lessonId];
+    const card=h('div',{class:'card'});
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="font-size:32px">${L.icon}</div>
+        <div><div class="label">${L.cat==='pro'?'Pro MCV':'Générale'}</div><div style="font-weight:800;font-size:17px;line-height:1.2">${escapeHtml(L.name)}</div></div>
+      </div>
+      <p class="sm" style="margin:6px 0 4px;color:var(--slate-700)">${L.intro}</p>
+    `;
+    L.sections.forEach(([h2, body])=>{
+      card.appendChild(el(`<div class="section-title" style="margin-top:14px">${escapeHtml(h2)}</div>`));
+      const block = document.createElement('div');
+      block.className = 'sm';
+      block.style.lineHeight = '1.55';
+      block.innerHTML = body;
+      block.querySelectorAll('ul,ol').forEach(u=>{u.style.margin='4px 0 8px';u.style.paddingLeft='20px'});
+      block.querySelectorAll('li').forEach(li=>{li.style.marginBottom='3px'});
+      block.querySelectorAll('p').forEach(p=>{p.style.margin='4px 0'});
+      card.appendChild(block);
+    });
+    const ret=h('div',{style:'margin-top:14px;padding:10px 12px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-left:4px solid var(--brand-600);border-radius:8px'});
+    ret.innerHTML = `<div style="font-size:11px;font-weight:700;color:var(--brand-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">📌 À retenir</div><div class="sm" style="line-height:1.5">${L.retenir}</div>`;
+    card.appendChild(ret);
+
+    const nav=h('div',{style:'display:flex;gap:8px;margin-top:14px'});
+    nav.appendChild(h('button',{class:'btn secondary',style:'flex:1',onClick:()=>{CURRENT_CTX.lessonId=null; render()}}, '← Sommaire'));
+    const themeDef = Object.entries(DOMAINS).find(([id,_])=>id===CURRENT_CTX.lessonId);
+    if(themeDef){
+      nav.appendChild(h('button',{class:'btn',style:'flex:1',onClick:()=>{
+        const lid = CURRENT_CTX.lessonId;
+        CURRENT_CTX = {theme:lid, count:10, session:null, idx:0, correct:0};
+        navigate('revise');
+      }}, "S'entraîner →"));
+    }
+    card.appendChild(nav);
+    wrap.appendChild(card);
+    return wrap;
+  }
+
+  wrap.appendChild(el(`
+    <div class="card">
+      <div class="section-title">📚 Cours — fiches de révision</div>
+      <p class="sm">17 fiches synthétiques (Pro MCV + Générales). Clique pour ouvrir une fiche, puis lance un quiz pour t'entraîner sur la matière.</p>
+    </div>
+  `));
+
+  const proCard=h('div',{class:'card'});
+  proCard.appendChild(el(`<div class="section-title">Pro MCV</div>`));
+  const proGrid=h('div',{class:'themes'});
+  Object.entries(LESSONS).filter(([_,L])=>L.cat==='pro').forEach(([id,L])=>{
+    const b=h('button',{class:'theme-btn',onClick:()=>{CURRENT_CTX.lessonId=id; render()}});
+    b.innerHTML=`${L.icon} ${escapeHtml(L.name.split(' — ')[0])}<span class="sub">${L.sections.length} sections</span>`;
+    proGrid.appendChild(b);
+  });
+  proCard.appendChild(proGrid);
+  wrap.appendChild(proCard);
+
+  const genCard=h('div',{class:'card'});
+  genCard.appendChild(el(`<div class="section-title">Matières générales</div>`));
+  const genGrid=h('div',{class:'themes'});
+  Object.entries(LESSONS).filter(([_,L])=>L.cat==='general').forEach(([id,L])=>{
+    const b=h('button',{class:'theme-btn',onClick:()=>{CURRENT_CTX.lessonId=id; render()}});
+    b.innerHTML=`${L.icon} ${escapeHtml(L.name)}<span class="sub">${L.sections.length} sections</span>`;
+    genGrid.appendChild(b);
+  });
+  genCard.appendChild(genGrid);
+  wrap.appendChild(genCard);
+
+  return wrap;
+}
+
 // ----- Mes questions (perso) -----
 function pageCustomQuestions(){
   CURRENT_CTX = Object.assign({editing:null}, CURRENT_CTX);
@@ -4237,6 +4583,7 @@ function render(){
     case 'progression': view=pageProgression(); break;
     case 'settings':    view=pageSettings();    break;
     case 'custom':      view=pageCustomQuestions(); break;
+    case 'course':      view=pageCourse();      break;
     default:            view=pageHome();
   }
   app.appendChild(view);
@@ -4247,11 +4594,49 @@ function render(){
 tickStreak();
 render();
 
-// ============ PWA : enregistrement du Service Worker ============
+// ============ PWA : Service Worker + mises à jour auto ============
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    navigator.serviceWorker.register('service-worker.js').then((reg) => {
+      // Vérifie périodiquement s'il y a une nouvelle version
+      setInterval(() => { try { reg.update() } catch(_){} }, 60 * 60 * 1000); // toutes les heures
+      // Détecte un SW en attente immédiatement
+      if (reg.waiting && navigator.serviceWorker.controller) {
+        showUpdateToast(reg.waiting);
+      }
+      // Surveille l'installation d'une nouvelle version
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            // Une nouvelle version est prête, mais l'ancien SW contrôle encore la page
+            showUpdateToast(nw);
+          }
+        });
+      });
+    }).catch(() => {});
+
+    // Quand le nouveau SW prend le contrôle → recharge propre (une seule fois)
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloading) return;
+      reloading = true;
+      window.location.reload();
+    });
   });
+}
+function showUpdateToast(worker){
+  if (document.getElementById('sarah-update-toast')) return;
+  const t = document.createElement('div');
+  t.id = 'sarah-update-toast';
+  t.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:140px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;padding:10px 14px;border-radius:14px;box-shadow:0 10px 30px -8px rgba(22,163,74,.45);font-weight:600;font-size:14px;display:flex;align-items:center;gap:10px;z-index:300;max-width:92%;cursor:pointer;animation:tin .35s ease-out';
+  t.innerHTML = '<span style="font-size:18px">🔄</span><span>Nouvelle version disponible — appuie pour mettre à jour</span>';
+  t.addEventListener('click', () => {
+    t.textContent = 'Mise à jour…';
+    if (worker && worker.postMessage) worker.postMessage({ type: 'SKIP_WAITING' });
+  });
+  document.body.appendChild(t);
 }
 
 // ============ PWA : bouton d'installation ============
