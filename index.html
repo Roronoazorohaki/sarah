@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#7c3aed" />
 <title>Sarah — Révision Bac Pro MCV</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Sarah" />
+<meta name="application-name" content="Sarah" />
 <style>
 :root{
   --brand-50:#f5f3ff; --brand-100:#ede9fe; --brand-200:#ddd6fe;
@@ -2931,15 +2940,26 @@ function listDomainsByCategory(){
     pro:     themes.filter(t=>t.category==='pro')
   };
 }
+function customQuestionsForTheme(id){
+  try{ return (STATE.customQuestions||[]).filter(q=>q && q.themeId===id) }
+  catch(e){ return [] }
+}
+function customQuestionsAll(){
+  try{ return (STATE.customQuestions||[]).filter(q=>q && q.q && Array.isArray(q.options)) }
+  catch(e){ return [] }
+}
 function getQuestionsByTheme(id){
-  const d=DOMAINS[id]; return d ? (DATA.questions[d.key]||[]) : [];
+  const d=DOMAINS[id]; const base = d ? (DATA.questions[d.key]||[]) : [];
+  return base.concat(customQuestionsForTheme(id));
 }
 function getQuestionsByCategory(cat){
-  return Object.entries(DOMAINS).filter(([_,d])=>d.category===cat)
-    .flatMap(([_,d])=>DATA.questions[d.key]||[]);
+  const base = Object.entries(DOMAINS).filter(([_,d])=>d.category===cat)
+    .flatMap(([id,d])=>(DATA.questions[d.key]||[]).concat(customQuestionsForTheme(id)));
+  return base;
 }
 function getAllQuestions(){
-  return Object.values(DOMAINS).flatMap(d=>DATA.questions[d.key]||[]);
+  const base = Object.entries(DOMAINS).flatMap(([id,d])=>(DATA.questions[d.key]||[]).concat(customQuestionsForTheme(id)));
+  return base;
 }
 function getQuestionById(id){
   return getAllQuestions().find(q=>q.id===id);
@@ -2990,6 +3010,191 @@ function generateCalcQuestion(id){
   return pick(CALC_GENS)(id);
 }
 
+// ============ Générateurs multi-thèmes (extension) ============
+// Pools sémantiques utilisés pour fabriquer des questions paramétrées.
+const SONCAS = {
+  'Sécurité':   { mots:['garantie','fiabilité','éprouvé','solide','sûr','testé','certifié','homologué','durable','sans risque'],
+                  argues:['garantie 5 ans pièces et main-d\'œuvre','testé sur 10 000 cycles sans panne','certifié ISO 9001'],
+                  citations:['Je veux quelque chose qui dure','Et si ça tombe en panne ?','Vous garantissez quoi ?','C\'est fiable au moins ?'] },
+  'Orgueil':    { mots:['exclusif','prestige','statut','reconnaissance','premium','élite','rare','distinction','luxe','signature'],
+                  argues:['édition limitée à 200 exemplaires','réservé aux clubs VIP','signé par le créateur'],
+                  citations:['Je veux être la première à l\'avoir','C\'est unique non ?','Qui d\'autre l\'a ?'] },
+  'Nouveauté':  { mots:['dernier','innovation','techno','tendance','moderne','inédit','nouveau','révolutionnaire','dernier-cri','sortie'],
+                  argues:['sorti la semaine dernière','technologie brevetée 2026','jamais vu sur le marché'],
+                  citations:['C\'est le dernier modèle ?','Y\'a quoi de nouveau ?','Vous avez la dernière version ?'] },
+  'Confort':    { mots:['simple','pratique','facile','rapide','léger','ergonomique','silencieux','intuitif','sans effort','plug & play'],
+                  argues:['installation en 2 minutes sans outil','interface intuitive, aucun tutoriel nécessaire','léger comme une plume'],
+                  citations:['C\'est simple à utiliser ?','Je veux pas me prendre la tête','J\'ai pas le temps de bricoler'] },
+  'Argent':     { mots:['promo','remise','prix','économies','solde','rentable','pas cher','-30 %','offre','meilleur prix'],
+                  argues:['économisez 240 € par an','remise de 25 % cette semaine','rentabilisé en 6 mois'],
+                  citations:['C\'est combien à la fin ?','Vous me faites un prix ?','Y\'a une promo ?'] },
+  'Sympathie':  { mots:['vous','ensemble','écoute','conseiller','partager','plaisir','accompagner','humain','relation','proche'],
+                  argues:['je vous accompagne après l\'achat','on construit la solution ensemble','on prend le temps qu\'il faut'],
+                  citations:['Vous êtes sympa, je préfère ici','J\'aime bien parler avec vous','Je reviendrai vous voir'] }
+};
+const SONCAS_KEYS = Object.keys(SONCAS);
+
+function genSoncasMot(id){
+  const correct = pick(SONCAS_KEYS);
+  const mot = pick(SONCAS[correct].mots);
+  const distract = shuffle(SONCAS_KEYS.filter(k=>k!==correct)).slice(0,3);
+  const opts = shuffle([correct, ...distract]);
+  return { id, theme:'SONCAS', chapter:'mots', difficulty:'facile', frequency_score:9, exam_probability:0.85,
+    q:`Le mot-clé « ${mot} » évoque quelle motivation SONCAS ?`,
+    options: opts, correct: opts.indexOf(correct),
+    explanation:`${correct} : ${SONCAS[correct].mots.slice(0,4).join(', ')}…` };
+}
+function genSoncasCitation(id){
+  const correct = pick(SONCAS_KEYS);
+  const phrase = pick(SONCAS[correct].citations);
+  const distract = shuffle(SONCAS_KEYS.filter(k=>k!==correct)).slice(0,3);
+  const opts = shuffle([correct, ...distract]);
+  return { id, theme:'SONCAS', chapter:'citations', difficulty:'moyen', frequency_score:9, exam_probability:0.85,
+    q:`Le client dit : « ${phrase} ». Motivation dominante ?`,
+    options: opts, correct: opts.indexOf(correct),
+    explanation:`${correct} : ${SONCAS[correct].mots.slice(0,4).join(', ')}.` };
+}
+function genSoncasArgument(id){
+  const correct = pick(SONCAS_KEYS);
+  const argument = pick(SONCAS[correct].argues);
+  const distract = shuffle(SONCAS_KEYS.filter(k=>k!==correct)).slice(0,3);
+  const opts = shuffle([correct, ...distract]);
+  return { id, theme:'SONCAS', chapter:'arguments', difficulty:'moyen', frequency_score:8, exam_probability:0.8,
+    q:`Quel argument répond le mieux à un client motivé par "${correct.toUpperCase()}" ? « ${argument} » est typique de quelle motivation ?`,
+    options: opts, correct: opts.indexOf(correct),
+    explanation:`L'argument joue sur ${correct}.` };
+}
+
+// CAP : Caractéristique → Avantage → Preuve
+const CAP_CASES = [
+  { car:'Garantie 5 ans pièces et main-d\'œuvre', av:'Tranquillité d\'esprit, aucun frais surprise', preuve:'87 % des clients ne paient aucune réparation hors-garantie sur la durée.' },
+  { car:'Batterie 4 500 mAh', av:'Autonomie d\'une journée entière sans recharge', preuve:'24 h en usage standard, mesuré sur 200 cycles indépendants.' },
+  { car:'Acier inoxydable 316L', av:'Ne rouille jamais, supporte l\'eau salée et les produits ménagers', preuve:'Utilisé dans les ustensiles médicaux et la coutellerie professionnelle.' },
+  { car:'Livraison sous 24 h', av:'Vous recevez le produit dès demain', preuve:'98 % des commandes livrées le lendemain selon notre rapport 2025.' },
+  { car:'Service après-vente 7j/7', av:'Une question, un problème ? Réponse immédiate', preuve:'Temps de réponse moyen mesuré : 4 minutes.' },
+  { car:'Fabrication française', av:'Production locale, qualité maîtrisée, circuits courts', preuve:'Usine certifiée Origine France Garantie, audit annuel.' },
+  { car:'Application mobile dédiée', av:'Vous gérez tout depuis votre téléphone, où que vous soyez', preuve:'Note 4,7/5 sur 50 000 avis App Store/Play Store.' }
+];
+function genCapAvantage(id){
+  const c = pick(CAP_CASES);
+  const distract = shuffle(CAP_CASES.filter(x=>x!==c)).slice(0,3).map(x=>x.av);
+  const opts = shuffle([c.av, ...distract]);
+  return { id, theme:'CAP / SONCAS-CAP', chapter:'avantage', difficulty:'moyen', frequency_score:9, exam_probability:0.85,
+    q:`Caractéristique : « ${c.car} ». Quel est l'avantage correspondant pour le client ?`,
+    options: opts, correct: opts.indexOf(c.av),
+    explanation:`CAP = Caractéristique → Avantage → Preuve. Ici, ${c.car} → ${c.av}.` };
+}
+function genCapPreuve(id){
+  const c = pick(CAP_CASES);
+  const distract = shuffle(CAP_CASES.filter(x=>x!==c)).slice(0,3).map(x=>x.preuve);
+  const opts = shuffle([c.preuve, ...distract]);
+  return { id, theme:'CAP / SONCAS-CAP', chapter:'preuve', difficulty:'examen', frequency_score:8, exam_probability:0.8,
+    q:`Avantage : « ${c.av} ». Quelle PREUVE le rend crédible ?`,
+    options: opts, correct: opts.indexOf(c.preuve),
+    explanation:`La preuve chiffre / illustre l'avantage. Sans preuve, l'argument reste de la promesse.` };
+}
+
+// Argumentation / Objections classiques
+const OBJECTIONS = [
+  { obj:'C\'est trop cher', reponse:'Reformuler et chiffrer le retour sur investissement, puis comparer au coût d\'inaction',
+    pieges:['Baisser immédiatement le prix','Demander au client son budget','Changer de produit'] },
+  { obj:'Je vais réfléchir', reponse:'Identifier la vraie objection cachée par une question ouverte',
+    pieges:['Insister "Achetez maintenant"','Promettre une remise','Envoyer un mail de relance immédiat'] },
+  { obj:'Je dois en parler à mon conjoint', reponse:'Proposer un RDV à 3 ou réservation 24 h sans engagement',
+    pieges:['Conclure quand même','Demander le numéro du conjoint','Brader le prix'] },
+  { obj:'J\'ai trouvé moins cher ailleurs', reponse:'Comparer la valeur (garantie, SAV, service) plutôt que le prix nu',
+    pieges:['S\'aligner systématiquement','Critiquer le concurrent','Refuser de discuter'] },
+  { obj:'Je n\'ai pas le temps', reponse:'Proposer un créneau bref et précis (15 min) avec bénéfice clair',
+    pieges:['Insister "5 minutes"','Promettre un cadeau','Envoyer une brochure'] }
+];
+function genObjection(id){
+  const o = pick(OBJECTIONS);
+  const opts = shuffle([o.reponse, ...shuffle(o.pieges).slice(0,3)]);
+  return { id, theme:'Argumentation & objections', chapter:'objections', difficulty:'examen', frequency_score:9, exam_probability:0.85,
+    q:`Objection : « ${o.obj} ». Meilleure réponse ?`,
+    options: opts, correct: opts.indexOf(o.reponse),
+    explanation:`Face à une objection : écouter, reformuler, traiter — pas brader.` };
+}
+
+// Anglais : vocabulaire commercial
+const ANGLAIS_VOCAB = [
+  ['client','customer'], ['prix','price'], ['remise','discount'], ['facture','invoice'],
+  ['vendeur','seller'], ['acheteur','buyer'], ['stock','inventory'], ['rayon','aisle'],
+  ['caisse','checkout'], ['rendre la monnaie','give change'], ['échantillon','sample'],
+  ['promotion','sale'], ['garantie','warranty'], ['livraison','delivery'], ['retour','return'],
+  ['reçu','receipt'], ['marge','margin'], ['chiffre d\'affaires','turnover'], ['fournisseur','supplier'],
+  ['en rupture','out of stock'], ['en commande','on order'], ['carte de fidélité','loyalty card']
+];
+function genAnglaisVocab(id){
+  const [fr,en] = pick(ANGLAIS_VOCAB);
+  const wrong = shuffle(ANGLAIS_VOCAB.filter(p=>p[1]!==en)).slice(0,3).map(p=>p[1]);
+  const opts = shuffle([en, ...wrong]);
+  return { id, theme:'Anglais', chapter:'vocabulaire_commercial', difficulty:'facile', frequency_score:8, exam_probability:0.75,
+    q:`Comment dit-on "${fr}" en anglais (contexte commercial) ?`,
+    options: opts, correct: opts.indexOf(en),
+    explanation:`${fr} = ${en}.` };
+}
+
+// Prospection — variantes d'accroches
+const PROSPECTION_OPENERS = [
+  { ouverture:'Bonjour, je vous appelle parce que [nom commun] m\'a parlé de vos enjeux sur X. Je ne sais pas si c\'est le bon moment pour 2 minutes ?',
+    bonne:true, libelle:'Référence + ancrage + permission' },
+  { ouverture:'Bonjour, c\'est [nom]. Vous avez 5 minutes ?', bonne:false, libelle:'Ouverture vague, sans ancrage' },
+  { ouverture:'Bonjour, est-ce que je peux vous présenter notre offre ?', bonne:false, libelle:'Demande de présenter avant d\'écouter' },
+  { ouverture:'Bonjour, vous êtes le bon interlocuteur pour [enjeu] ?', bonne:false, libelle:'Filtre trop direct, sans contexte' }
+];
+function genProspectionOpener(id){
+  const sample = shuffle(PROSPECTION_OPENERS);
+  const opts = sample.slice(0,4).map(o=>o.ouverture);
+  const correctIdx = opts.findIndex(o => PROSPECTION_OPENERS.find(p=>p.ouverture===o && p.bonne));
+  // Garantir qu'une bonne ouverture est dans le panel
+  if(correctIdx<0){
+    const good = PROSPECTION_OPENERS.find(p=>p.bonne).ouverture;
+    opts[0] = good;
+    return { id, theme:'Prospection', chapter:'accroche', difficulty:'moyen', frequency_score:8, exam_probability:0.75,
+      q:`Pour une prospection téléphonique B2B, quelle accroche est la plus efficace ?`,
+      options: opts, correct: 0,
+      explanation:`Bonne accroche : référence + ancrage du sujet + permission de prendre du temps.` };
+  }
+  return { id, theme:'Prospection', chapter:'accroche', difficulty:'moyen', frequency_score:8, exam_probability:0.75,
+    q:`Pour une prospection téléphonique B2B, quelle accroche est la plus efficace ?`,
+    options: opts, correct: correctIdx,
+    explanation:`Bonne accroche : référence + ancrage du sujet + permission de prendre du temps.` };
+}
+
+// ----- Registre des générateurs par thème -----
+const DYN_GEN_BY_THEME = {
+  soncas:        [genSoncasMot, genSoncasCitation, genSoncasArgument],
+  cap:           [genCapAvantage, genCapPreuve],
+  argumentation: [genObjection],
+  marges:        CALC_GENS,
+  anglais:       [genAnglaisVocab],
+  prospection:   [genProspectionOpener]
+};
+function hasDynGenerators(themeId){ return Array.isArray(DYN_GEN_BY_THEME[themeId]) && DYN_GEN_BY_THEME[themeId].length>0 }
+function generateForTheme(themeId, n=1){
+  const gens = DYN_GEN_BY_THEME[themeId];
+  if(!gens || !gens.length) return [];
+  return Array.from({length:n},(_,i)=>pick(gens)('dyn_'+themeId+'_'+Date.now()+'_'+i+'_'+Math.floor(Math.random()*1000)));
+}
+
+// ----- Analyse des points faibles par thème -----
+function themeMasteryScore(themeId){
+  const qs = getQuestionsByTheme(themeId);
+  if(!qs.length) return 100;
+  let seen=0, sum=0;
+  for(const q of qs){
+    const m = STATE.mastery[q.id];
+    if(m && (m.correct+m.wrong)>0){ seen++; sum += m.score }
+  }
+  if(!seen) return 50; // neutre quand jamais vu
+  return Math.round((sum/seen)/5 * 100);
+}
+function weakestThemes(){
+  const arr = listThemes().map(t=>({id:t.id, name:t.name, score:themeMasteryScore(t.id), seen:Object.keys(STATE.mastery).filter(k=>k.startsWith(t.id+'_')||k.startsWith('custom_')).length}));
+  return arr.sort((a,b)=>a.score-b.score);
+}
+
 // ============ Moteur adaptatif (SRS pondéré) ============
 function weightedPick(questions, mastery, n){
   const now=Date.now();
@@ -3023,7 +3228,51 @@ function buildSession({themeId='all', count=10, mastery={}, mode='adaptive'}){
   else pool=getQuestionsByTheme(themeId);
   if(!pool||!pool.length) return [];
   if(mode==='random' || mode==='exam') return pickN(pool,count);
-  return weightedPick(pool, mastery, count);
+
+  // Boost adaptatif : quand themeId='all', sur-pondère les thèmes faibles
+  let effectiveMastery = mastery;
+  if(themeId==='all'){
+    const weak = weakestThemes();
+    if(weak.length){
+      // Calc weak penalty : thèmes <60% gagnent un boost de poids
+      const themeBoost = {};
+      weak.forEach(t=>{ themeBoost[t.id] = t.score<60 ? 2.5 : (t.score<80 ? 1.3 : 1) });
+      // Augmente artificiellement (6 - score) en ramenant le score perçu vers le bas
+      effectiveMastery = {};
+      for(const q of pool){
+        const m = mastery[q.id] || {score:0,lastSeen:0,correct:0,wrong:0};
+        // chercher le thème via id pattern (prefix_xx) ou fallback DOMAINS
+        let themeKey = 'all';
+        for(const id of Object.keys(DOMAINS)){
+          if(q.id && (q.id.startsWith(id+'_') || (q.themeId===id))){ themeKey = id; break }
+        }
+        const boost = themeBoost[themeKey] || 1;
+        // Si boost>1, on baisse artificiellement le score pour augmenter le poids
+        const adjusted = boost>1 ? Math.max(0, m.score - (boost-1)) : m.score;
+        effectiveMastery[q.id] = {...m, score: adjusted};
+      }
+    }
+  }
+  let picked = weightedPick(pool, effectiveMastery, count);
+  // Injection ~20% de questions générées pour le thème, si générateurs dispo
+  if(themeId!=='all' && themeId!=='general' && themeId!=='pro' && hasDynGenerators(themeId)){
+    const nDyn = Math.max(1, Math.round(picked.length * 0.2));
+    const dyn = generateForTheme(themeId, nDyn);
+    // remplace les nDyn derniers par des générées (et mélange)
+    picked = shuffle(picked.slice(0, picked.length-nDyn).concat(dyn));
+  }
+  return picked;
+}
+function buildSurpriseSession(count=10){
+  // Session 100% générée, focus sur les thèmes faibles
+  const weak = weakestThemes().filter(t=>hasDynGenerators(t.id));
+  const eligible = weak.length ? weak.map(t=>t.id) : Object.keys(DYN_GEN_BY_THEME);
+  const out = [];
+  for(let i=0;i<count;i++){
+    const themeId = eligible[i % eligible.length];
+    out.push(...generateForTheme(themeId, 1));
+  }
+  return out;
 }
 function buildExam(){ return pickN(getAllQuestions(), 20) }
 
@@ -3073,6 +3322,7 @@ const INITIAL = {
   xp:0, combo:0, maxCombo:0, streak:0, lastDay:null,
   mastery:{}, errors:[], badges:[], newBadges:[], history:[],
   examsTaken:0, oralDone:0, survivalBest:0,
+  customQuestions:[], // questions ajoutées par la personne
   settings:{sound:true, haptics:true, dark:false}
 };
 function loadState(){
@@ -3098,12 +3348,18 @@ function tickStreak(){
   STATE.lastDay=t; saveState();
 }
 
-function answerQuestion(q, ok){
+function answerQuestion(q, ok, ms){
   const m={...STATE.mastery};
-  const e=m[q.id]||{score:0,lastSeen:0,correct:0,wrong:0};
+  const e=m[q.id]||{score:0,lastSeen:0,correct:0,wrong:0,avgMs:0,answers:0};
   if(ok){e.score=Math.min(5,e.score+1); e.correct++}
   else  {e.score=Math.max(0,e.score-1); e.wrong++}
   e.lastSeen=Date.now();
+  // Moyenne mobile du temps de réponse (ms) — sert au diagnostic des points faibles
+  if(typeof ms === 'number' && ms > 0 && ms < 5*60*1000){
+    const n = (e.answers||0);
+    e.avgMs = Math.round(((e.avgMs||0)*n + ms) / (n+1));
+    e.answers = n + 1;
+  }
   m[q.id]=e;
   STATE.mastery=m;
   STATE.combo = ok ? STATE.combo+1 : 0;
@@ -3130,6 +3386,33 @@ function passExam(score20){
 }
 function addOralDone(){ STATE.oralDone+=1; checkBadges(); saveState() }
 function recordSurvival(n){ STATE.survivalBest = Math.max(STATE.survivalBest,n); checkBadges(); saveState() }
+
+// ----- Questions personnalisées (utilisateur) -----
+function addCustomQuestion(payload){
+  // payload : { themeId, q, options:[4], correct, explanation? }
+  if(!payload || !payload.q || !Array.isArray(payload.options) || payload.options.length<2) return false;
+  const id = 'custom_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+  const themeName = (DOMAINS[payload.themeId]?.name) || 'Personnalisée';
+  const item = {
+    id, themeId: payload.themeId, theme: themeName,
+    chapter: 'perso',
+    difficulty: payload.difficulty || 'perso',
+    frequency_score: 6, exam_probability: 0.6,
+    q: String(payload.q).trim(),
+    options: payload.options.map(o=>String(o)),
+    correct: Math.max(0, Math.min(payload.options.length-1, Number(payload.correct)||0)),
+    explanation: (payload.explanation||'').trim(),
+    custom: true,
+    created: Date.now()
+  };
+  STATE.customQuestions = [...(STATE.customQuestions||[]), item];
+  saveState();
+  return id;
+}
+function removeCustomQuestion(id){
+  STATE.customQuestions = (STATE.customQuestions||[]).filter(q=>q.id!==id);
+  saveState();
+}
 function checkBadges(examScore20){
   const have=new Set(STATE.badges); const give=[];
   const add=id=>{if(!have.has(id)){have.add(id); give.push(id)}};
@@ -3179,7 +3462,7 @@ function showToast(badge){
 }
 
 // ============ Routing minimal ============
-const ROUTES = ['home','revise','exam','oral','survival','errors','stats','progression','settings'];
+const ROUTES = ['home','revise','exam','oral','survival','errors','stats','progression','settings','custom'];
 let CURRENT_ROUTE = 'home';
 let CURRENT_CTX = {}; // état temporaire de la vue (session quiz en cours, etc.)
 function navigate(route){
@@ -3296,13 +3579,14 @@ function pageHome(){
       </div>
     </div>
   `));
+  const customN = (STATE.customQuestions||[]).length;
   const tiles = [
     ['revise','📚','Réviser','Quiz adaptatif'],
     ['exam','📝','Examen blanc','20 questions chrono'],
     ['oral','🎤','Mode oral','Scénarios SONCAS/CAP'],
     ['survival','🛡️','Survie','3 vies, va loin'],
     ['errors','⚠️','Mes erreurs',`${STATE.errors.length} à revoir`],
-    ['settings','⚙️','Paramètres','Export, reset']
+    ['custom','✏️','Mes questions', customN>0 ? `${customN} perso` : 'Ajoute les tiennes']
   ];
   const grid=h('div',{class:'tiles'});
   tiles.forEach(([r,emoji,ttl,sub])=>{
@@ -3327,12 +3611,13 @@ function pageHome(){
 
 // ----- QuestionCard helper (vue) -----
 function renderQuestionCard(q, opts={}){
-  // opts: onAnswer(ok, idx), showExplanation
+  // opts: onAnswer(ok, idx, ms), showExplanation
   const showExplanation = opts.showExplanation !== false;
   const card=h('div',{class:'card'});
-  card.appendChild(el(`<div class="qhead">${q.theme||''} · ${q.difficulty||'standard'}</div>`));
+  card.appendChild(el(`<div class="qhead">${q.theme||''} · ${q.difficulty||'standard'}${q.custom?' · perso':''}</div>`));
   card.appendChild(el(`<h3 class="qtext">${escapeHtml(q.q)}</h3>`));
   const list=h('div');
+  const startedAt = Date.now();
   let picked=null, revealed=false;
   const buttons=[];
   q.options.forEach((opt,i)=>{
@@ -3350,6 +3635,7 @@ function renderQuestionCard(q, opts={}){
   const validate = h('button',{class:'btn',disabled:'disabled',onClick:()=>{
     if(picked===null) return;
     revealed=true;
+    const ms = Date.now() - startedAt;
     buttons.forEach((b,i)=>{
       b.disabled=true;
       if(i===q.correct) b.classList.add('correct');
@@ -3362,7 +3648,7 @@ function renderQuestionCard(q, opts={}){
       ex.innerHTML=`<b>Explication :</b> ${escapeHtml(q.explanation)}`;
       card.appendChild(ex);
     }
-    opts.onAnswer && opts.onAnswer(picked===q.correct, picked);
+    opts.onAnswer && opts.onAnswer(picked===q.correct, picked, ms);
   }},'Valider');
   card.appendChild(validate);
   return card;
@@ -3382,6 +3668,8 @@ function pageRevise(){
     let s;
     if(CURRENT_CTX.theme==='calc_dyn'){
       s=Array.from({length:CURRENT_CTX.count},(_,i)=>generateCalcQuestion('calc_dyn_'+Date.now()+'_'+i));
+    } else if(CURRENT_CTX.theme==='surprise'){
+      s=buildSurpriseSession(CURRENT_CTX.count);
     } else {
       s=buildSession({themeId:CURRENT_CTX.theme, count:CURRENT_CTX.count, mastery:STATE.mastery, mode:'adaptive'});
     }
@@ -3402,6 +3690,16 @@ function pageRevise(){
     const calcRow=h('div',{style:'margin-top:8px'});
     calcRow.appendChild(h('button',{class:'chip'+(CURRENT_CTX.theme==='calc_dyn'?' active':''),style:'width:100%;display:block;text-align:center',onClick:()=>{CURRENT_CTX.theme='calc_dyn'; render()}},'🧮 Calculs commerciaux (générés à l\'infini)'));
     mix.appendChild(calcRow);
+    const surpRow=h('div',{style:'margin-top:6px'});
+    surpRow.appendChild(h('button',{class:'chip'+(CURRENT_CTX.theme==='surprise'?' active':''),style:'width:100%;display:block;text-align:center',onClick:()=>{CURRENT_CTX.theme='surprise'; render()}},"✨ Surprends-moi (générées sur tes points faibles)"));
+    mix.appendChild(surpRow);
+    // Diagnostic auto : points faibles
+    const weak = weakestThemes().filter(t=>t.score<70).slice(0,3);
+    if(weak.length){
+      const tip=h('div',{style:'margin-top:8px;font-size:12px;color:var(--slate-600)'});
+      tip.innerHTML = '💡 Points à retravailler : <b>' + weak.map(w=>w.name+' ('+w.score+'%)').join(', ') + '</b>';
+      mix.appendChild(tip);
+    }
     wrap.appendChild(mix);
 
     // Pro
@@ -3449,8 +3747,8 @@ function pageRevise(){
   wrap.appendChild(el(`<div class="bar"><span style="width:${((CURRENT_CTX.idx)/s.length)*100}%"></span></div>`));
   wrap.appendChild(h('div',{class:'gap'}));
   wrap.appendChild(renderQuestionCard(q,{
-    onAnswer:(ok,_)=>{
-      answerQuestion(q,ok);
+    onAnswer:(ok,_,ms)=>{
+      answerQuestion(q,ok,ms);
       if(ok) CURRENT_CTX.correct++;
       // refresh header
       document.getElementById('app').replaceChild(renderHeader(), document.getElementById('app').firstChild);
@@ -3538,8 +3836,8 @@ function pageExam(){
   wrap.appendChild(el(`<div class="xs">Question ${CURRENT_CTX.idx+1} / ${exam.length}</div>`));
   wrap.appendChild(renderQuestionCard(q,{
     showExplanation:false,
-    onAnswer:(ok)=>{
-      answerQuestion(q,ok);
+    onAnswer:(ok,_,ms)=>{
+      answerQuestion(q,ok,ms);
       if(ok) CURRENT_CTX.correct++;
     }
   }));
@@ -3644,8 +3942,8 @@ function pageSurvival(){
   wrap.appendChild(el(`<div class="lives"><span>${lives}</span><span style="color:var(--brand-700);font-size:14px">Combo ${CURRENT_CTX.streak}</span></div>`));
   wrap.appendChild(h('div',{class:'gap'}));
   wrap.appendChild(renderQuestionCard(CURRENT_CTX.current,{
-    onAnswer:(ok)=>{
-      answerQuestion(CURRENT_CTX.current,ok);
+    onAnswer:(ok,_,ms)=>{
+      answerQuestion(CURRENT_CTX.current,ok,ms);
       if(ok) CURRENT_CTX.streak++;
       else CURRENT_CTX.lives--;
     }
@@ -3682,7 +3980,7 @@ function pageErrors(){
   if(CURRENT_CTX.i>=qs.length) CURRENT_CTX.i=qs.length-1;
   const q=qs[CURRENT_CTX.i];
   wrap.appendChild(el(`<div class="xs" style="margin-bottom:6px">Erreur ${CURRENT_CTX.i+1} / ${qs.length}</div>`));
-  wrap.appendChild(renderQuestionCard(q,{onAnswer:(ok)=>{answerQuestion(q,ok)}}));
+  wrap.appendChild(renderQuestionCard(q,{onAnswer:(ok,_,ms)=>{answerQuestion(q,ok,ms)}}));
   const row=h('div',{class:'row'});
   row.appendChild(h('button',{class:'btn secondary',disabled:CURRENT_CTX.i===0?'disabled':null,onClick:()=>{CURRENT_CTX.i--;render()}},'← Précédente'));
   row.appendChild(h('button',{class:'btn',disabled:CURRENT_CTX.i+1>=qs.length?'disabled':null,onClick:()=>{CURRENT_CTX.i++;render()}},'Suivante →'));
@@ -3765,6 +4063,99 @@ function pageProgression(){
 }
 
 // ----- Settings -----
+// ----- Mes questions (perso) -----
+function pageCustomQuestions(){
+  CURRENT_CTX = Object.assign({editing:null}, CURRENT_CTX);
+  const wrap=h('div');
+  // Introduction honnête
+  wrap.appendChild(el(`
+    <div class="card">
+      <div class="section-title">✏️ Mes questions</div>
+      <p class="sm">Ajoute tes propres questions. Elles sont stockées dans ton navigateur (localStorage) et automatiquement mélangées dans les sessions du thème choisi.</p>
+      <p class="xs" style="color:var(--slate-500);margin-top:4px">Note : Sarah fonctionne 100% en local (pas d'IA en ligne). Pour générer du contenu inédit, on utilise un système de modèles paramétrés (variations infinies sur SONCAS, CAP, calculs…) plus tes ajouts personnels.</p>
+    </div>
+  `));
+
+  // Liste existante
+  const list = STATE.customQuestions || [];
+  if(list.length){
+    const c=h('div',{class:'card'});
+    c.appendChild(el(`<div class="section-title">${list.length} question(s) perso</div>`));
+    list.slice().reverse().forEach(q=>{
+      const item=h('div',{style:'border-bottom:1px dashed var(--slate-200);padding:6px 0'});
+      item.innerHTML = `<div class="xs" style="color:var(--brand-600);font-weight:600">${escapeHtml(q.theme||'?')}</div><div class="sm" style="margin:2px 0">${escapeHtml(q.q)}</div>`;
+      const delBtn=h('button',{class:'btn ghost',style:'color:var(--rose-600);font-size:12px;padding:2px 8px;width:auto;display:inline-block',onClick:()=>{
+        if(confirm('Supprimer cette question ?')){ removeCustomQuestion(q.id); render() }
+      }}, 'Supprimer');
+      item.appendChild(delBtn);
+      c.appendChild(item);
+    });
+    wrap.appendChild(c);
+  }
+
+  // Formulaire
+  const themes = listThemes();
+  const f=h('div',{class:'card'});
+  f.appendChild(el(`<div class="section-title">➕ Nouvelle question</div>`));
+  let cur = { themeId: themes[0]?.id || 'soncas', q:'', options:['','','',''], correct:0, explanation:'' };
+
+  const labelStyle = 'display:block;font-size:12px;font-weight:600;color:var(--slate-700);margin:8px 0 4px';
+  const inputStyle = 'width:100%;padding:8px 10px;border:1.5px solid var(--brand-200);border-radius:10px;font-size:13px;outline:none;box-sizing:border-box;font-family:inherit';
+
+  // Theme select
+  f.appendChild(el(`<label style="${labelStyle}">Thème</label>`));
+  const sel=h('select',{style:inputStyle, onChange:e=>{cur.themeId=e.target.value}});
+  themes.forEach(t=>sel.appendChild(el(`<option value="${t.id}">${t.icon} ${t.name}</option>`)));
+  f.appendChild(sel);
+
+  // Question text
+  f.appendChild(el(`<label style="${labelStyle}">Énoncé de la question</label>`));
+  const txt=h('textarea',{style:inputStyle+';min-height:60px;resize:vertical',placeholder:'Ex : Que signifie l\'acronyme CAP ?', onInput:e=>{cur.q=e.target.value}});
+  f.appendChild(txt);
+
+  // 4 options + radio for correct
+  f.appendChild(el(`<label style="${labelStyle}">4 réponses (sélectionne la bonne avec le radio à gauche)</label>`));
+  for(let i=0;i<4;i++){
+    const row=h('div',{style:'display:flex;gap:6px;align-items:center;margin-bottom:6px'});
+    const radio=h('input',{type:'radio',name:'correct_opt',value:String(i), onChange:e=>{cur.correct=parseInt(e.target.value,10)}});
+    if(i===0) radio.checked=true;
+    const inp=h('input',{type:'text',style:inputStyle+';flex:1',placeholder:'Réponse '+String.fromCharCode(65+i), onInput:e=>{cur.options[i]=e.target.value}});
+    row.appendChild(radio); row.appendChild(inp);
+    f.appendChild(row);
+  }
+
+  // Explanation (optional)
+  f.appendChild(el(`<label style="${labelStyle}">Explication (optionnel)</label>`));
+  const expl=h('textarea',{style:inputStyle+';min-height:50px',placeholder:'Pourquoi cette réponse est correcte…', onInput:e=>{cur.explanation=e.target.value}});
+  f.appendChild(expl);
+
+  const errBox = h('div',{style:'color:var(--rose-600);font-size:12px;min-height:16px;margin-top:6px'});
+  f.appendChild(errBox);
+
+  const save=h('button',{class:'btn',style:'margin-top:8px',onClick:()=>{
+    const cleanedOpts = cur.options.map(o=>o.trim()).filter(o=>o.length);
+    if(!cur.q.trim()){ errBox.textContent='✗ L\'énoncé est vide.'; return }
+    if(cleanedOpts.length<2){ errBox.textContent='✗ Il faut au moins 2 réponses non vides.'; return }
+    if(new Set(cleanedOpts).size !== cleanedOpts.length){ errBox.textContent='✗ Les réponses doivent être différentes.'; return }
+    if(cur.correct>=cleanedOpts.length){ errBox.textContent='✗ La bonne réponse pointe sur une case vide.'; return }
+    const id = addCustomQuestion({
+      themeId: cur.themeId, q: cur.q, options: cleanedOpts,
+      correct: cur.correct, explanation: cur.explanation
+    });
+    if(id){
+      errBox.textContent='';
+      render();
+    } else {
+      errBox.textContent='✗ Erreur lors de l\'enregistrement.';
+    }
+  }}, 'Enregistrer ma question');
+  f.appendChild(save);
+
+  f.appendChild(h('button',{class:'btn secondary',style:'margin-top:6px',onClick:()=>navigate('home')}, '← Retour à l\'accueil'));
+  wrap.appendChild(f);
+  return wrap;
+}
+
 function pageSettings(){
   const wrap=h('div');
   wrap.appendChild(el(`
@@ -3790,7 +4181,12 @@ function pageSettings(){
   d.appendChild(h('button',{class:'btn danger',onClick:doReset},'Tout réinitialiser'));
   wrap.appendChild(d);
 
-  wrap.appendChild(el(`<div class="txt-c xs" style="margin-top:8px">Sarah v1.1 — 100% local — un seul fichier HTML</div>`));
+  // À propos / IA locale
+  const about=h('div',{class:'card'});
+  about.appendChild(el(`<div class="section-title">À propos</div>`));
+  about.appendChild(el(`<p class="sm" style="margin:0 0 4px">Sarah v1.2 — 100% local, hors-ligne, gratuit, sans tracker.</p>`));
+  about.appendChild(el(`<p class="xs" style="color:var(--slate-500);line-height:1.5">Le moteur adaptatif apprend de tes réponses : il suit la maîtrise par question et par thème, mesure ton temps de réponse, et priorise les thèmes faibles. Les questions sont enrichies par un générateur procédural (variations infinies sur SONCAS, CAP, calculs commerciaux, anglais, prospection). Une vraie IA générative nécessiterait une connexion + clé API ; en local, on combine pondération adaptative + templates paramétrés + tes questions perso.</p>`));
+  wrap.appendChild(about);
   return wrap;
 
   function doExport(){
@@ -3840,6 +4236,7 @@ function render(){
     case 'stats':       view=pageStats();       break;
     case 'progression': view=pageProgression(); break;
     case 'settings':    view=pageSettings();    break;
+    case 'custom':      view=pageCustomQuestions(); break;
     default:            view=pageHome();
   }
   app.appendChild(view);
@@ -3849,6 +4246,96 @@ function render(){
 // ============ Boot ============
 tickStreak();
 render();
+
+// ============ PWA : enregistrement du Service Worker ============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
+
+// ============ PWA : bouton d'installation ============
+(function setupInstallUI(){
+  // Détection : déjà installée ?
+  const isStandalone = (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches)
+                     || window.navigator.standalone === true;
+  if (isStandalone) return; // déjà installée → pas de bouton
+
+  // Détection iOS Safari (pas de prompt programmatique → hint)
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPhone|iPad|iPod/.test(ua) && !window.MSStream;
+  const isInWebAppiOS = window.navigator.standalone === true;
+  const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+
+  let deferredPrompt = null;
+
+  // Conteneur (créé lazy)
+  function mountBanner(content, onClick, dismissible){
+    let b = document.getElementById('sarah-install-banner');
+    if (b) b.remove();
+    b = document.createElement('div');
+    b.id = 'sarah-install-banner';
+    b.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:84px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;padding:10px 14px;border-radius:14px;box-shadow:0 10px 30px -8px rgba(91,33,182,.45);font-weight:600;font-size:14px;display:flex;align-items:center;gap:10px;z-index:200;max-width:92%;animation:tin .35s ease-out';
+    b.innerHTML = content;
+    if (onClick) b.addEventListener('click', onClick);
+    if (dismissible){
+      const x = document.createElement('button');
+      x.textContent = '✕';
+      x.setAttribute('aria-label','Fermer');
+      x.style.cssText = 'background:transparent;border:none;color:#fff;font-size:16px;cursor:pointer;opacity:.85;padding:0 2px';
+      x.addEventListener('click', (e)=>{ e.stopPropagation(); b.remove(); try{ sessionStorage.setItem('sarah-install-dismissed','1') }catch(_){} });
+      b.appendChild(x);
+    }
+    document.body.appendChild(b);
+    return b;
+  }
+
+  function userDismissed(){
+    try { return sessionStorage.getItem('sarah-install-dismissed') === '1' } catch(_) { return false }
+  }
+
+  // Cas 1 : Chrome/Edge/Android — événement beforeinstallprompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (userDismissed()) return;
+    mountBanner(
+      '<span style="font-size:18px">📲</span><span>Installer Sarah sur ton appareil</span>',
+      async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        try {
+          const choice = await deferredPrompt.userChoice;
+          if (choice && choice.outcome === 'accepted'){
+            const b = document.getElementById('sarah-install-banner'); if (b) b.remove();
+          }
+        } catch(_){}
+        deferredPrompt = null;
+      },
+      true
+    );
+  });
+
+  // Cas 2 : iOS Safari — bannière d'instruction (pas de prompt API)
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (deferredPrompt) return; // un prompt natif est dispo, on laisse ce flux
+      if (userDismissed()) return;
+      if (isIOS) {
+        mountBanner(
+          '<span style="font-size:18px">📲</span><span style="font-size:13px;line-height:1.35">Pour installer : <b>Partager ⬆️</b> → <b>Sur l\'écran d\'accueil</b></span>',
+          null, true
+        );
+      }
+    }, 1200);
+  });
+
+  // Si installée pendant la session → masquer le bandeau
+  window.addEventListener('appinstalled', () => {
+    const b = document.getElementById('sarah-install-banner'); if (b) b.remove();
+    deferredPrompt = null;
+  });
+})();
 </script>
 </body>
 </html>
